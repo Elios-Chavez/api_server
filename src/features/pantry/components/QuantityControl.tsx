@@ -1,0 +1,2 @@
+import { Minus, Plus } from 'lucide-react';
+export function QuantityControl({ quantity, onDecrease, onIncrease }: { quantity: number; onDecrease: () => void; onIncrease: () => void }) { return <span className="quantity-control"><button aria-label="Disminuir cantidad" onClick={onDecrease} type="button"><Minus aria-hidden="true"/></button><strong aria-live="polite">{quantity}</strong><button aria-label="Aumentar cantidad" onClick={onIncrease} type="button"><Plus aria-hidden="true"/></button></span>; }

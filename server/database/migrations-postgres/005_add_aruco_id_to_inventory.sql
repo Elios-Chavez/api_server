@@ -1,0 +1,2 @@
+ALTER TABLE inventory
+ADD COLUMN IF NOT EXISTS aruco_id INT;

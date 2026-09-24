@@ -1,0 +1,52 @@
+import cors from 'cors';
+import express, { type ErrorRequestHandler } from 'express';
+import * as controller from './controllers/businessController.js';
+import { ask as askCopilot } from './controllers/copilotController.js';
+import { observations } from './controllers/edgeController.js';
+import * as customerController from './controllers/customerController.js';
+import { checkPostgresDatabase } from './database/postgresPool.js';
+import { serverEnv } from './config/env.js';
+import { demand } from './controllers/demandController.js';
+
+const app = express();
+const allowedOrigins = serverEnv.corsOrigin.split(',').map((origin) => origin.trim()).filter(Boolean);
+app.use(cors({ origin: allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins }));
+app.use(express.json({ limit: '512kb' }));
+
+app.get('/api/health', async (_request, response) => { if (serverEnv.persistenceMode === 'json') return response.json({ status: 'ok', database: 'json', timestamp: new Date().toISOString(), version: serverEnv.version }); try { if (serverEnv.persistenceMode === 'postgres') await checkPostgresDatabase(); return response.json({ status: 'ok', database: serverEnv.persistenceMode, timestamp: new Date().toISOString(), version: serverEnv.version }); } catch { return response.status(503).json({ status: 'degraded', database: 'disconnected', timestamp: new Date().toISOString(), version: serverEnv.version }); } });
+app.get('/api/products', controller.products);
+app.post('/api/products', controller.createProduct);
+app.post('/api/products/scan', controller.scanProduct);
+app.patch('/api/products/:id', controller.patchProduct);
+app.get('/api/inventory', controller.inventory);
+app.patch('/api/inventory/:id', controller.patchInventory);
+app.get('/api/sales', controller.sales);
+app.post('/api/sales', controller.createSale);
+app.get('/api/purchases', controller.purchases);
+app.post('/api/purchases', controller.createPurchase);
+app.get('/api/promotions', controller.promotions);
+app.post('/api/promotions', controller.createPromotion);
+app.patch('/api/promotions/:id', controller.patchPromotion);
+app.get('/api/feedback', controller.feedback);
+app.post('/api/feedback', controller.createFeedback);
+app.get('/api/alerts', controller.alerts);
+app.get('/api/summary', controller.summary);
+app.post('/api/alerts/notify', controller.notifyAlerts);
+app.get('/api/edge/config', controller.edgeConfig);
+app.post('/api/budget/plan', controller.budget);
+app.post('/api/edge/observations', observations);
+app.post('/api/copilot/ask', askCopilot);
+app.get('/api/customer/products', customerController.products);
+app.post('/api/customer/sessions', customerController.createSession);
+app.post('/api/customer/messages', customerController.ask);
+app.get('/api/analytics/demand', demand);
+app.post('/api/customer-assistant/ask', customerController.ask);
+
+const errorHandler: ErrorRequestHandler = (error, _request, response, next) => {
+  void next;
+  const statusCode = typeof error?.statusCode === 'number' ? error.statusCode : 500;
+  response.status(statusCode).json({ error: statusCode === 500 ? 'Error interno del servidor.' : error.message });
+};
+app.use(errorHandler);
+
+export default app;

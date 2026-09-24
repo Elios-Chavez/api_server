@@ -1,0 +1,1 @@
+import type {AlertSeverity} from '@/types/domain'; const labels:Record<AlertSeverity,string>={priority:'Prioridad',attention:'Atención',opportunity:'Oportunidad',stable:'Estable'}; export function StatusBadge({status}:{status:AlertSeverity}){return <span className={`inline-flex rounded-full px-3 py-1 text-sm font-bold status-${status}`}>{labels[status]}</span>}

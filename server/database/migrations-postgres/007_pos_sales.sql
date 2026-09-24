@@ -1,0 +1,21 @@
+ALTER TABLE sales
+  ADD COLUMN IF NOT EXISTS subtotal NUMERIC(10,2),
+  ADD COLUMN IF NOT EXISTS discount_total NUMERIC(10,2) NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS payment_method VARCHAR(20) NOT NULL DEFAULT 'cash',
+  ADD COLUMN IF NOT EXISTS status VARCHAR(20) NOT NULL DEFAULT 'completed';
+
+ALTER TABLE sale_items
+  ADD COLUMN IF NOT EXISTS discount NUMERIC(10,2) NOT NULL DEFAULT 0;
+
+CREATE TABLE IF NOT EXISTS sale_payments (
+  id VARCHAR(140) PRIMARY KEY,
+  sale_id VARCHAR(120) NOT NULL REFERENCES sales(id) ON DELETE RESTRICT,
+  method VARCHAR(20) NOT NULL,
+  amount NUMERIC(10,2) NOT NULL,
+  reference VARCHAR(180),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_sale_payments_sale_id ON sale_payments(sale_id);
+
+UPDATE sales SET subtotal = COALESCE(subtotal, total), discount_total = COALESCE(discount_total, 0)

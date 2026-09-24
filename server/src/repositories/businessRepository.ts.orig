@@ -1,0 +1,40 @@
+import { serverEnv } from '../config/env.js';
+import type { EdgeObservationRecord, Feedback, InventoryRecord, Product, Promotion, PurchaseRecord, SaleInput, SaleRecord } from '../types/domain.js';
+import { JsonRepository } from './jsonRepository.js';
+import { PostgresRepository } from './postgresRepository.js';
+
+export type BusinessData = { products: Product[]; inventory: InventoryRecord[]; sales: SaleRecord[]; purchases: PurchaseRecord[]; promotions: Promotion[]; feedback: Feedback[]; processedObservationIds: string[]; edgeObservations: EdgeObservationRecord[] };
+export interface BusinessRepository { read(): Promise<BusinessData>; updateInventory(productId: string, patch: Partial<InventoryRecord>): Promise<InventoryRecord[]>; registerSale(input: SaleInput): Promise<SaleRecord>; registerPurchase(productId: string, quantity: number): Promise<PurchaseRecord>; createPromotion(promotion: Promotion): Promise<Promotion>; updatePromotion(id: string, patch: Partial<Promotion>): Promise<Promotion>; submitFeedback(feedback: Feedback): Promise<Feedback>; ingestObservation(observation: EdgeObservationRecord): Promise<BusinessData>; replace?(data: BusinessData): Promise<void>; }
+
+class JsonBusinessRepository implements BusinessRepository {
+  public constructor(private readonly repository: JsonRepository<BusinessData>) {}
+  public read() { return this.repository.read(); }
+  public async updateInventory(productId: string, patch: Partial<InventoryRecord>) { return (await this.repository.update((data) => ({ ...data, inventory: data.inventory.map((item) => item.id === productId ? { ...item, ...patch } : item) }))).inventory; }
+  public async registerSale(input: SaleInput) { const next = await this.repository.update((data) => { const requestedItems = input.items ?? [{ productId: input.productId!, quantity: input.quantity! }]; const items = requestedItems.map((requested) => { const product = data.inventory.find((candidate) => candidate.id === requested.productId)!; const subtotal = product.price * requested.quantity; return { id: `${requested.productId}-${Date.now()}`, productId: product.id, productName: product.name, quantity: requested.quantity, unitPrice: product.price, discount: 0, subtotal }; }); const subtotal = items.reduce((sum, item) => sum + item.subtotal, 0); const discountTotal = input.discountTotal ?? 0; const sale = { id: `sale-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, productId: items[0].productId, productName: items[0].productName, quantity: items[0].quantity, unitPrice: items[0].unitPrice, createdAt: new Date().toISOString(), items, subtotal, discountTotal, total: subtotal - discountTotal, paymentMethod: input.paymentMethod ?? 'cash' as const }; return { ...data, inventory: data.inventory.map((item) => { const sold = requestedItems.find((requested) => requested.productId === item.id); return sold ? { ...item, digitalStock: item.digitalStock - sold.quantity } : item; }), sales: [sale, ...data.sales] }; }); return next.sales[0]; }
+  public async registerPurchase(productId: string, quantity: number) { const next = await this.repository.update((data) => { const product = data.inventory.find((item) => item.id === productId)!; const purchase = { id: `purchase-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, productId, productName: product.name, quantity, createdAt: new Date().toISOString() }; return { ...data, inventory: data.inventory.map((item) => item.id === productId ? { ...item, digitalStock: item.digitalStock + quantity } : item), purchases: [purchase, ...data.purchases] }; }); return next.purchases[0]; }
+  public async createPromotion(promotion: Promotion) { await this.repository.update((data) => ({ ...data, promotions: [...data.promotions, promotion] })); return promotion; }
+  public async updatePromotion(id: string, patch: Partial<Promotion>) { const next = await this.repository.update((data) => ({ ...data, promotions: data.promotions.map((item) => item.id === id ? { ...item, ...patch, id } : item) })); return next.promotions.find((item) => item.id === id)!; }
+  public async submitFeedback(feedback: Feedback) { await this.repository.update((data) => ({ ...data, feedback: [...data.feedback, feedback] })); return feedback; }
+  public async ingestObservation(observation: EdgeObservationRecord) { return this.repository.update((data) => ({ ...data, processedObservationIds: [...data.processedObservationIds, observation.observationId], edgeObservations: [...(data.edgeObservations ?? []), observation], inventory: data.inventory.map((item) => { const entry = observation.items.find((candidate) => candidate.productId === item.id); return entry ? { ...item, physicalStock: entry.quantity, observedAt: observation.observedAt } : item; }) })); }
+  public replace(data: BusinessData) { return this.repository.write(data); }
+}
+const inventory: InventoryRecord[] = [
+  { id: 'producto-a', name: 'Producto A', category: 'Demo', price: 45, digitalStock: 8, physicalStock: 8, reorderPoint: 5, averageSales: 3 },
+  { id: 'leche', name: 'Leche entera', category: 'Bebidas', price: 30, digitalStock: 5, physicalStock: 5, reorderPoint: 6, averageSales: 4 },
+  { id: 'detergente', name: 'Detergente', category: 'Limpieza', price: 58, digitalStock: 18, physicalStock: 18, reorderPoint: 5, averageSales: 1 },
+  { id: 'arroz', name: 'Arroz', category: 'Abarrotes', price: 28, digitalStock: 18, physicalStock: 18, reorderPoint: 6, averageSales: 5 },
+  { id: 'agua', name: 'Agua', category: 'Bebidas', price: 18, digitalStock: 24, physicalStock: 24, reorderPoint: 8, averageSales: 6 },
+];
+const seed: BusinessData = {
+  products: inventory.map(({ id, name, category, price, digitalStock }) => ({ id, name, category, price, stock: digitalStock })),
+  inventory,
+  sales: [],
+  purchases: [],
+  promotions: [{ id: 'promo-1', title: 'La compra de hoy empieza aquí', description: 'Explora ideas sencillas para organizar tu próxima visita.', active: true }, { id: 'promo-2', title: 'Arma tu despensa', description: 'Encuentra lo esencial y prepara tu compra con calma.', active: true }],
+  feedback: [{ id: 'feedback-1', mood: 'happy', comment: 'La experiencia fue clara y rápida.', createdAt: '2026-09-23T00:00:00.000Z' }],
+  processedObservationIds: [],
+  edgeObservations: [],
+};
+
+export { seed as businessSeed };
+export const businessRepository: BusinessRepository = serverEnv.persistenceMode === 'postgres' ? new PostgresRepository(seed) : new JsonBusinessRepository(new JsonRepository<BusinessData>(serverEnv.dataPath, seed));

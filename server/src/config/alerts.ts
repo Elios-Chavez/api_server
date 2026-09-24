@@ -1,0 +1,1 @@
+export const DEMAND_OPPORTUNITY_THRESHOLD = 3; export const DEMAND_OPPORTUNITY_PERIOD_DAYS = 30; export const DEMAND_OPPORTUNITY_PERIOD = "30d" as const;

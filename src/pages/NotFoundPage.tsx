@@ -1,0 +1,1 @@
+import {Link} from 'react-router-dom'; export function NotFoundPage(){return <div className="mx-auto max-w-xl py-20 text-center"><h1 className="text-4xl font-extrabold">Página no encontrada</h1><Link className="mt-8 inline-flex min-h-12 items-center rounded-xl bg-primary px-5 font-bold text-white" to="/">Volver al inicio</Link></div>}

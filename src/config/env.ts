@@ -1,0 +1,1 @@
+export const env={apiBaseUrl:import.meta.env.VITE_API_BASE_URL??'',dataMode:import.meta.env.VITE_DATA_MODE==='api'?'api':'local',useMocks:import.meta.env.VITE_USE_MOCKS!=='false',hackatecMvp:import.meta.env.VITE_HACKATEC_MVP!=='false',adminDemoPin:import.meta.env.VITE_ADMIN_DEMO_PIN??'2026'} as const;

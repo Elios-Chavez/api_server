@@ -1,0 +1,14 @@
+export type AlertSeverity = 'priority' | 'attention' | 'opportunity' | 'stable';
+export type Product = { id: string; name: string; category: string; price: number; stock: number; imageUrl?: string };
+export type Promotion = { id: string; title: string; description: string; imageUrl?: string; active: boolean };
+export type InventoryRecord = { id: string; name: string; category: string; price: number; digitalStock: number; physicalStock: number; reorderPoint: number; averageSales: number; observedAt?: string; arucoId?: number };
+export type PaymentMethod = 'cash' | 'card' | 'transfer';
+export type SaleItemRecord = { id?: string; productId: string; productName: string; quantity: number; unitPrice: number; discount: number; subtotal: number };
+export type SaleInput = { items?: Array<{ productId: string; quantity: number }>; productId?: string; quantity?: number; discountTotal?: number; paymentMethod?: PaymentMethod };
+export type SaleRecord = { id: string; productId: string; productName: string; quantity: number; unitPrice: number; createdAt: string; items: SaleItemRecord[]; subtotal: number; discountTotal: number; total: number; paymentMethod: PaymentMethod };
+export type PurchaseRecord = { id: string; productId: string; productName: string; quantity: number; createdAt: string };
+export type FeedbackMood = 'sad' | 'neutral' | 'happy'; export type Feedback = { id: string; mood: FeedbackMood; comment: string; createdAt: string };
+export type InventoryAlert = { id: string; productId: string; productName: string; severity: AlertSeverity; title: string; message: string; digitalStock: number; physicalStock: number; difference: number; reorderPoint: number; averageSales: number; suggestedAction: string; createdAt: string };
+export type EdgeObservationItem = { productId: string; quantity: number };
+export type EdgeObservation = { observationId?: string; zoneId: string; sourceId: string; timestamp: string; items: EdgeObservationItem[] };
+export type EdgeObservationRecord = { observationId: string; zoneId: string; sourceId: string; observedAt: string; items: EdgeObservationItem[] };

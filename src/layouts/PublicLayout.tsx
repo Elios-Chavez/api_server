@@ -1,0 +1,1 @@
+import {Outlet} from 'react-router-dom'; import {PublicHeader} from '@/components/public/PublicHeader'; export function PublicLayout(){return <div className="min-h-screen"><a className="skip-link" href="#main-content">Saltar al contenido</a><PublicHeader/><main id="main-content" className="mx-auto w-full max-w-[1288px] px-6 py-6 lg:px-8"><Outlet/></main></div>}

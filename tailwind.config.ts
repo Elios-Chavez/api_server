@@ -1,0 +1,1 @@
+import type {Config} from 'tailwindcss'; export default {content:['./index.html','./src/**/*.{ts,tsx}'],theme:{extend:{colors:{primary:'hsl(var(--primary))',surface:'hsl(var(--surface))',muted:'hsl(var(--muted))',border:'hsl(var(--border))',background:'var(--app-background)',foreground:'var(--app-text)'}}},plugins:[]} satisfies Config;

@@ -1,0 +1,2 @@
+import { Outlet } from 'react-router-dom'; import { AdminSidebar } from '@/components/admin/AdminSidebar'; import { AdminHeader } from '@/components/admin/AdminHeader';
+export function AdminLayout(){return <div className="admin-shell"><a className="skip-link" href="#main-content">Saltar al contenido</a><AdminSidebar/><div className="admin-content"><AdminHeader/><main id="main-content" className="admin-main"><Outlet/></main></div></div>}

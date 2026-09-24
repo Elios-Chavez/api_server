@@ -1,0 +1,2 @@
+ALTER TABLE products ALTER COLUMN image_url TYPE TEXT;
+ALTER TABLE promotions ALTER COLUMN image_url TYPE TEXT;

@@ -1,0 +1,2 @@
+import { Search } from 'lucide-react';
+export function ProductSearch({ value, onChange }: { value: string; onChange: (value: string) => void }) { return <label className="product-search"><Search aria-hidden="true" className="size-5"/><span className="sr-only">Buscar producto</span><input aria-label="Buscar producto" onChange={(event) => onChange(event.target.value)} placeholder="Buscar producto…" type="search" value={value}/></label>; }

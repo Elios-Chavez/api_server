@@ -1,0 +1,2 @@
+const categories = ['Todos', 'Abarrotes', 'Bebidas', 'Limpieza', 'Higiene', 'Snacks'];
+export function CategoryList({ selected, onSelect }: { selected: string; onSelect: (category: string) => void }) { return <nav aria-label="Categorías de productos" className="pantry-categories">{categories.map((category) => <button className={selected === category ? 'category-button is-selected' : 'category-button'} key={category} onClick={() => onSelect(category)} type="button">{category}</button>)}</nav>; }

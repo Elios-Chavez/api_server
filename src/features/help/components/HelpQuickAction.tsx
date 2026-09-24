@@ -1,0 +1,2 @@
+import type { ReactNode } from 'react'; import { Link } from 'react-router-dom';
+export function HelpQuickAction({ title, description, icon, to, onClick }: { title: string; description: string; icon: ReactNode; to?: string; onClick?: () => void }) { const content = <><span className="help-action-icon">{icon}</span><span><strong>{title}</strong><small>{description}</small></span></>; return to ? <Link className="help-action" to={to}>{content}</Link> : <button className="help-action" onClick={onClick} type="button">{content}</button>; }

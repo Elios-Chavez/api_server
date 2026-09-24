@@ -1,0 +1,3 @@
+import type { AlertSeverity } from '@/types/domain'; import { severityOrder } from '@/features/alerts/utils/alertRules';
+const labels: Record<'all'|AlertSeverity,string>={all:'Todos',priority:'Prioridad',attention:'Atención',opportunity:'Oportunidad',stable:'Estable'};
+export function SeverityFilter({value,onChange}:{value:'all'|AlertSeverity;onChange:(value:'all'|AlertSeverity)=>void}){return <div aria-label="Filtrar alertas" className="severity-filter" role="tablist">{(['all',...severityOrder] as const).map((option)=><button aria-selected={value===option} className={value===option?'is-selected':''} onClick={()=>onChange(option)} role="tab" key={option} type="button">{labels[option]}</button>)}</div>}

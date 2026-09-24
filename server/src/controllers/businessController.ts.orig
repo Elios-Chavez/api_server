@@ -1,0 +1,20 @@
+import type { NextFunction, Request, Response } from 'express';
+import * as service from '../services/businessService.js';
+
+const body = (request: Request) => request.body as Record<string, unknown>;
+export async function products(_request: Request, response: Response, next: NextFunction) { try { response.json(await service.getProducts()); } catch (error) { next(error); } }
+export async function inventory(_request: Request, response: Response, next: NextFunction) { try { response.json(await service.getInventory()); } catch (error) { next(error); } }
+export async function patchInventory(request: Request, response: Response, next: NextFunction) { try { response.json(await service.updateInventory(String(request.params.id), body(request))); } catch (error) { next(error); } }
+export async function sales(_request: Request, response: Response, next: NextFunction) { try { response.json(await service.getSales()); } catch (error) { next(error); } }
+export async function createSale(request: Request, response: Response, next: NextFunction) { try { response.status(201).json(await service.registerSale(body(request) as never)); } catch (error) { next(error); } }
+export async function purchases(_request: Request, response: Response, next: NextFunction) { try { response.json(await service.getPurchases()); } catch (error) { next(error); } }
+export async function createPurchase(request: Request, response: Response, next: NextFunction) { try { response.status(201).json(await service.registerPurchase(body(request))); } catch (error) { next(error); } }
+export async function promotions(_request: Request, response: Response, next: NextFunction) { try { response.json(await service.getPromotions()); } catch (error) { next(error); } }
+export async function createPromotion(request: Request, response: Response, next: NextFunction) { try { response.status(201).json(await service.createPromotion(body(request) as never)); } catch (error) { next(error); } }
+export async function patchPromotion(request: Request, response: Response, next: NextFunction) { try { response.json(await service.updatePromotion(String(request.params.id), body(request))); } catch (error) { next(error); } }
+export async function feedback(_request: Request, response: Response, next: NextFunction) { try { response.json(await service.getFeedback()); } catch (error) { next(error); } }
+export async function createFeedback(request: Request, response: Response, next: NextFunction) { try { response.status(201).json(await service.submitFeedback(body(request) as never)); } catch (error) { next(error); } }
+export async function alerts(_request: Request, response: Response, next: NextFunction) { try { response.json(await service.getAlerts()); } catch (error) { next(error); } }
+export async function edgeConfig(_request: Request, response: Response, next: NextFunction) { try { response.json(await service.getEdgeConfig()); } catch (error) { next(error); } }
+export async function summary(_request: Request, response: Response, next: NextFunction) { try { response.json(await service.getSummary()); } catch (error) { next(error); } }
+export async function budget(request: Request, response: Response, next: NextFunction) { try { response.json(await service.planReplenishmentBudget(body(request))); } catch (error) { next(error); } }

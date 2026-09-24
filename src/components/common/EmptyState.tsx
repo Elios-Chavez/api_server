@@ -1,0 +1,1 @@
+export function EmptyState({message='Aún no hay información disponible.'}:{message?:string}){return <div className="rounded-2xl border border-dashed border-border bg-surface p-8 text-center text-muted">{message}</div>}

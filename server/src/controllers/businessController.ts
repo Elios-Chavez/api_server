@@ -1,10 +1,12 @@
 import type { NextFunction, Request, Response } from 'express';
 import * as service from '../services/businessService.js';
+import { analyzeProductImage } from '../vision/productVisionService.js';
 export async function createProduct(request: Request, response: Response, next: NextFunction) { try { response.status(201).json(await service.createProduct(body(request) as never)); } catch (error) { next(error); } }
 
 const body = (request: Request) => request.body as Record<string, unknown>;
 export async function patchProduct(request: Request, response: Response, next: NextFunction) { try { response.json(await service.updateProduct(String(request.params.id), body(request) as never)); } catch (error) { next(error); } }
 export async function scanProduct(request: Request, response: Response, next: NextFunction) { try { response.status(200).json(await service.scanProduct(body(request).code)); } catch (error) { next(error); } }
+export async function analyzeProduct(request: Request, response: Response, next: NextFunction) { try { response.json(await analyzeProductImage(body(request).image)); } catch (error) { next(error); } }
 export async function products(_request: Request, response: Response, next: NextFunction) { try { response.json(await service.getProducts()); } catch (error) { next(error); } }
 export async function inventory(_request: Request, response: Response, next: NextFunction) { try { response.json(await service.getInventory()); } catch (error) { next(error); } }
 export async function patchInventory(request: Request, response: Response, next: NextFunction) { try { response.json(await service.updateInventory(String(request.params.id), body(request))); } catch (error) { next(error); } }

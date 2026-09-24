@@ -1,6 +1,6 @@
 export type AlertSeverity = 'priority' | 'attention' | 'opportunity' | 'stable';
-export type Product = { id: string; name: string; category: string; price: number; stock: number; imageUrl?: string; aisle?: string; shelf?: string; expirationDate?: string };
-export type ProductInput = { id: string; name: string; category: string; price: number; stock: number; reorderPoint: number; imageUrl?: string; aisle?: string; shelf?: string; expirationDate?: string };
+export type Product = { id: string; name: string; category: string; price: number; stock: number; imageUrl?: string; aisle?: string; shelf?: string; expirationDate?: string; qrCode?: string; description?: string };
+export type ProductInput = { id: string; name: string; category: string; price: number; stock: number; reorderPoint: number; imageUrl?: string; aisle?: string; shelf?: string; expirationDate?: string; qrCode?: string; description?: string };
 export type Promotion = { id: string; title: string; description: string; imageUrl?: string; active: boolean };
 export type InventoryRecord = { id: string; name: string; category: string; price: number; imageUrl?: string; aisle?: string; shelf?: string; digitalStock: number; physicalStock: number; reorderPoint: number; averageSales: number; observedAt?: string; arucoId?: number; expirationDate?: string };
 export type PaymentMethod = 'cash' | 'card' | 'transfer';
